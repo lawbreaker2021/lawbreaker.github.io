@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>LawBreaker2022 Issues</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom CSS for the '3 Col Portfolio' Template -->
+    <link href="css/3-col-portfolio.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <!-- <a class="navbar-brand" href="http://startbootstrap.com">Start Bootstrap</a> -->
+          <a class="navbar-brand" href="http://lawbreaker2022.github.io">LawBreaker2022</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="index.html">Safety Issues</a></li>
+            <li><a href="efficiency.html">Efficiency Issues</a></li>
+            <li><a href="translation.html">Traffic Laws Translation</a></li>
+            <li><a href="code.html">Traffic Laws Translation-actual code</a></li>
+            <li><a href="sourcecode.html">Source Code & Supplementary Materials</a></li>
+            <!-- <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li> -->
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container -->
+    </nav>
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-lg-12">
+          <h1 class="page-header">LawBreaker <small>Efficiency Issues</small></h1>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 portfolio-item">
+          <video id="issue3" width="560" height="380" controls muted>
+            <source src="Fail_to_overtake_the_static_obstacle.mp4" type="video/mp4">
+          </video>
+          <!-- <a href="Rush_Yellow_Lights2*Accidents.mp4"><img class="img-responsive" src="http://placehold.it/700x400"></a> -->
+          <h3><a href="Fail_to_overtake_the_static_obstacle.mp4">Fail to Overtake the Static Vehicle Ahead at Intersection.</a></h3>
+          <script>
+            var vid3 = document.getElementById("issue3");
+            function getCurTime3() { 
+              alert(vid3.currentTime);
+            } 
+            function setCurTime3(time) {              
+              vid3.currentTime=time;
+            } 
+          </script> 
+          <p>
+            In this situation, there is a static NPC vehicle ahead and the traffic light is green (<a href="#" onclick="setCurTime3(20)">20S</a>). The ego vehicle is expected to overtake the static NPC vehicle. However, the ego vehicle gets stuck and fail to overtake (<a href="#" onclick="setCurTime3(23)">23S</a>). Hence, the ego vehicle violates the green light part of Article38.
+            <!-- As can been seen form the video, the ego vehicle chooses to overtake from the lane with opposite direction <a href="#" onclick="setCurTime2(3)">3S</a> even when there is possible pass route on the right lane, and cause collision when returning to the original lane (<a href="#" onclick="setCurTime2(12.5)">12S</a>). 
+           Hence, the ego vehicle violates Article44 and Article47. -->
+          </p>
+        </div>
+        
+        <div class="col-md-6 portfolio-item">
+          <video id="issue2" width="560" height="380" controls muted>
+            <source src="apollo6.0_can_not_change_lane_keep_looping_around.mp4" type="video/mp4">
+          </video>
+          <!-- <a href="Rush_Yellow_Lights2*Accidents.mp4"><img class="img-responsive" src="http://placehold.it/700x400"></a> -->
+          <h3><a href="apollo6.0_can_not_change_lane_keep_looping_around.mp4">Apollo6.0 fail to make lane changes and always loop around.</a></h3>
+          <script>
+            var vid2 = document.getElementById("issue2");
+            function getCurTime2() { 
+              alert(vid2.currentTime);
+            } 
+            function setCurTime2(time) {              
+              vid2.currentTime=time;
+            } 
+          </script> 
+          <p>
+            In this situation, we set a destination that can be reached by a lane change after crossing the intersection ahead. However, Apollo6.0 plans the route weirdly and the ego vehicle keeps looping around and will never reach the destination as shown in the video.
+            <!-- As can been seen form the video, the ego vehicle chooses to overtake from the lane with opposite direction <a href="#" onclick="setCurTime2(3)">3S</a> even when there is possible pass route on the right lane, and cause collision when returning to the original lane (<a href="#" onclick="setCurTime2(12.5)">12S</a>). 
+           Hence, the ego vehicle violates Article44 and Article47. -->
+          </p>
+        </div>
+
+
+
+
+
+
+        
+
+      </div>
+
+      <hr>
+
+      <div class="row text-center">
+        
+        <div class="col-lg-12">
+          <ul class="pagination">
+            <li><a href="efficiency.html">&laquo;</a></li>
+            <li><a href="index.html">1</a></li>
+            <li class="active"><a href="efficiency2.html">2</a></li>
+            <li><a href="efficiency2.html">&raquo;</a></li>
+          </ul>        
+        </div>
+
+      </div>
+
+    </div><!-- /.container -->
+
+   <!--  <div class="container">
+
+      <hr>
+
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p>Copyright &copy; Company <span id="getCurrentDate"></span></p>
+          </div>
+        </div>
+      </footer>
+      
+    </div> --> <!-- /.container -->
+
+    <!-- JavaScript -->
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script type="text/javascript">
+      var dt = new Date();
+      document.getElementById('getCurrentDate').innerHTML = dt.getFullYear();
+    </script>
+  </body>
+
+</html>

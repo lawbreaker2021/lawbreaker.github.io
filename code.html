@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>LawBreaker2022 Issues</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom CSS for the '3 Col Portfolio' Template -->
+    <link href="css/3-col-portfolio.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <!-- <a class="navbar-brand" href="http://startbootstrap.com">Start Bootstrap</a> -->
+          <a class="navbar-brand" href="http://lawbreaker2022.github.io">LawBreaker2022</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="index.html">Safety Issues</a></li>
+            <li><a href="efficiency.html">Efficiency Issues</a></li>
+            <li><a href="translation.html">Traffic Laws Translation</a></li>
+            <li><a href="code.html">Traffic Laws Translation-actual code</a></li>
+            <li><a href="sourcecode.html">Source Code & Supplementary Materials</a></li>
+            <!-- <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li> -->
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container -->
+    </nav>
+
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-lg-12">
+          <h1 class="page-header">LawBreaker <small>Traffic Laws Translation-actual code</small></h1>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <p>
+          In this part, we provide 1.Scripts of Chinese Traffic laws. 2.AVUnit scenarios scripts.
+        </p>
+
+        <p>
+          1.Scripts of Chinese Traffic laws. 
+        </p>
+
+        <pre>
+          <code>
+...DSL description for scenario0
+Trace trace = EXE(scenario0);
+
+//law38
+//Green Lights
+law38_sub1_1 = (trafficLightAhead.color == green) & (stoplineAhead(2) | junctionAhead(2)) & ~PriorityNPCAhead & ~PriorityPedsAhead;
+law38_sub1_2 = F[0,2](speed > 0.5);
+law38_sub1 = G (law38_sub1_1 -> law38_sub1_2); 
+//Yellow Lights
+law38_sub2_1 = ((trafficLightAhead.color == yellow) & (stoplineAhead(0) | currentLane.number .+ 1 == 0)) -> (F[0,2] (speed > 0.5));
+law38_sub2_2 = ((trafficLightAhead.color == yellow) & stoplineAhead(3.5) & ~stoplineAhead(0.5) & currentLane.number > 0) -> (F[0,3] (speed < 0.5));
+law38_sub2 = G (law38_sub2_1 & law38_sub2_2); 
+//Red LightS
+law38_sub3_1 = ((trafficLightAhead.color == red) & (stoplineAhead(2) | junctionAhead(2)) & ~(direction == right)) -> (F[0,3] (speed < 0.5));
+law38_sub3_2 = ((trafficLightAhead.color == red) & (stoplineAhead(2) | junctionAhead(2)) & direction == right & ~PriorityNPCAhead & ~PriorityPedsAhead) -> (F[0,2] (speed > 0.5));
+law38_sub3 = G (law38_sub3_1 & law38_sub3_2); 
+law38 = law38_sub1 & law38_sub2 & law38_sub3;
+
+
+//law44
+law44_sub1 = currentLane.number >= 2;
+law44_sub2 = (speed >= speedLimit.lowerLimit) & (speed <= speedLimit.upperLimit);
+law44_sub3 = isChangingLane & currentLane.number >= 2;
+law44_sub4 = G(law44_sub1 -> law44_sub2);
+law44_sub5 = G(law44_sub3 -> ~PriorityNPCAhead);
+law44 = law44_sub4 & law44_sub5;
+
+
+//law45
+law45 = G( speed >= speedLimit.lowerLimit & speed <= speedLimit.upperLimit);
+
+
+//law46
+law_46_sub2 = G( (direction == left | direction == right | isTurningAround) -> (speed <= 30 ));
+law_46_sub3 = G( (rain >= 0.5 | fog >= 0.5 | snow >=0.5 | visibility <= 50 ) -> (speed <= 30));
+law46 = (law_46_sub2) & (law_46_sub3);
+
+//law47
+law47_sub1 = (turnSignal == left) & ((F[-1,2](hornOn)) | ((highBeamOn & (highBeamOn -> (F[0, 2](lowBeamOn)) ) ) | (lowBeamOn & (lowBeamOn -> (F[0, 2](highBeamOn)) ) ))) & (F[0, 10]( (turnSignal == right) & (((isChangingLane) -> (NearestNPC(5))) & (isChangingLane) ) ));
+law47 = G(isOverTaking -> law47_sub1);
+
+
+//law50
+law50 = G( (PriorityNPCAhead | crosswalkAhead(2)) -> ~(gear == 2) ); 
+
+
+//law51
+//turn_left
+law51_sub3_1 =(trafficLightAhead.color == green & direction == left & Time <= 20:00 & Time >= 7:00) -> (turnSignal == left);
+law51_sub3_2 =(trafficLightAhead.color == green & direction == left & (Time >= 20:00 | Time <= 7:00)) -> (turnSignal == left & lowBeamOn);
+law51_sub3 = G(law51_sub3_1 & law51_sub3_2);  
+//go_in_line_at_green
+law51_sub4_1 = trafficLightAhead.color == green & (~NPCAhead(8) | (( NPCAhead(8) -> F[0,2](NPCAhead.speed > 0.5)  ) & NPCAhead(8)));
+law51_sub4_2 = (F[0, 3](speed > 0.5)) & ~NPCAhead(0.5);
+law51_sub4 = G(law51_sub4_1 -> law51_sub4_2);
+//stop_in_line_at_red
+law51_sub5_1 = trafficLightAhead.color == red & (stoplineAhead(2) | junctionAhead(2) | NPCAhead(0.5));
+law51_sub5_2 = F[0, 2](speed < 0.5);
+law51_sub5 = G(law51_sub5_1 -> law51_sub5_2);  
+//tuen_right_stop_in_line_at_red
+law51_sub6 = G((direction == right & NPCAhead(2) & (F[0, 2](NPCAhead.speed < 0.5)) ) -> F[0, 3] (speed < 0.5));
+//priority_for_straight
+law51_sub7 = G(((direction == right | direction == left) & (PriorityNPCAhead | PriorityPedsAhead)) -> F[0, 2] (speed < 0.5));
+law51 = law51_sub3 & law51_sub4 & law51_sub5 & law51_sub6 & law51_sub7;
+
+
+//law52
+law52 = G((signalAhead == 0 & (PriorityNPCAhead | PriorityPedsAhead) & junctionAhead(1)) -> F[0, 2] (speed < 0.5));
+
+
+//law53
+law53 = G((isTrafficJam & (NPCAhead.speed < 0.5 | NPCAhead(0.5) | junctionAhead(1) ))-> F[0, 2] (speed < 0.5));
+
+//law57
+law57_sub1 = G(direction == left ->  turnSignal == left);
+law57_sub2 = G(direction == right ->  turnSignal == right);
+law57 = law57_sub1 & law57_sub2;
+
+//law58
+law58_sub1_1 = (~streetLightOn & (Time >= 20:00 | Time <= 7:00) ) | (rain >= 0.5 | fog >= 0.5 | snow >= 0.5);
+law58_sub1 = (law58_sub1_1 & ~NPCAhead(10))-> highBeamOn;
+law58_sub2 =  NPCAhead(10) -> ~highBeamOn;
+law58_sub3 = fog >= 0.5 -> (fogLightOn & warningFlashOn);
+law58 = G(law58_sub1 & law58_sub2 & law58_sub3);
+
+//law59
+law59_sub1 = (crosswalkAhead(5) | (signalAhead == 0 & junctionAhead(1)) ) & (Time >= 20:00 | Time <= 7:00);
+law59_sub2 = F[0,3](highBeamOn & (highBeamOn -> F[0,3](lowBeamOn)) ) | F[0,3](lowBeamOn & (lowBeamOn -> F[0,3](highBeamOn)) );
+law59 = G(law59_sub1 ->  law59_sub2);
+
+
+//law62
+law62 = G (~honkingAllowed ->  ~hornOn);
+
+
+trace |= law38 & law44 & law45 & law46 & law47 & law50 & law51 & law52 & law53 & law57 & law58 & law59 & law62; 
+          </code>
+        </pre>
+
+
+
+
+
+
+
+        <p>
+          2.AVUnit scenarios scripts. The following three AVUnit Scenario Scripts are tested in the experiment.
+        </p>
+
+        <p>
+          Scenario1
+        </p>
+
+        <pre>
+          <code>
+// intersection of two single-direction roads
+map_name = "san_francisco";
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+
+car_model = "gt_sensors";
+ego_init_position ="lane_623"->50;
+ego_init_state = (ego_init_position);
+ego_target_position = "lane_145"->50;
+ego_target_state = (ego_target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: move from lane_627 to lane_145
+npc1_init_position =  "lane_627"->140;
+npc1_init_state = (npc1_init_position, ,6);
+npc1_waypoint =(("lane_627"->150, ,7), ("lane_627"->200, ,8), ("lane_899"->2, ,5), ("lane_145"->10, ,7));
+npc1_dest_state = ("lane_145"->130);
+npc1 = Vehicle(npc1_init_state, Waypoint(npc1_waypoint) , npc1_dest_state);
+
+//npc2: move from lane_627 to lane_151
+npc2_init_position =  "lane_627"->150;
+npc2_init_state = (npc2_init_position, ,8);
+npc2_dest_state = ("lane_151"->50);
+npc2 = Vehicle(npc2_init_state, , npc2_dest_state);
+
+//npc3: move from lane_626 to lane_150
+npc3_init_position =  "lane_626"->140;
+npc3_init_state = (npc3_init_position, ,7);
+npc3_dest_state = ("lane_150"->50);
+npc3 = Vehicle(npc3_init_state, , npc3_dest_state);
+
+//npc4: move from lane_625 to lane_149
+npc4_init_position =  "lane_625"->150;
+npc4_init_state = (npc4_init_position, ,4);
+npc4_dest_state = ("lane_149"->30);
+npc4 = Vehicle(npc4_init_state, , npc4_dest_state);
+
+scenario0 = CreateScenario{load(map_name);
+              ego_vehicle;
+              {npc1, npc2, npc3, npc4};
+              {}; // no pedestrians;
+              {}; // no obstacles;
+              evn;
+};
+
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+        <p>
+          Scenario2
+        </p>
+
+        <pre>
+          <code>
+//lane change in the same road
+
+map_name = "san_francisco";
+car_model = "gt_sensors";
+    initial_position = "lane_221" -> 10;
+ego_init_state = (initial_position);
+target_position = "lane_220" -> 100;
+ego_target_state = (target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: start from lane_221 
+npc1_init_position = "lane_221" -> 20;
+npc1 = Vehicle((npc1_init_position, ,7.0));
+
+//npc2: start from lane_221
+npc2_init_position = "lane_221" -> 50;
+npc2 = Vehicle((npc2_init_position, , 7.0));
+
+//npc3: move from lane_220 to lane_231
+npc3_init_position = "lane_220" -> 10;
+npc3 = Vehicle((npc3_init_position, , 5.5), , ("lane_231"->100));
+
+//npc4: start from lane_220
+npc4_init_position = "lane_220" -> 30;
+npc4 = Vehicle((npc4_init_position, , 6.0));
+
+//npc5: move from lane_220 to lane_253
+npc5_init_state = ("lane_220" -> 50, ,7.0);
+npc5_waypoint = (("lane_220" -> 100, ,6.0), ("lane_1037" -> 0, ,5.0), ("lane_1037" -> 10, ,4.0), ("lane_253" -> 10, ,8.0));
+npc5 = Vehicle(npc5_init_state, Waypoint(npc5_waypoint),("lane_253" -> 200));
+
+
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+
+scenario0 = CreateScenario{load(map_name);
+                 ego_vehicle;
+                 {npc1, npc2, npc3, npc4, npc5}; 
+                 {}; // no pedestrians;
+                 {}; // no obstacles;
+                 evn; 
+};
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+        <p>
+          Scenario3
+        </p>
+
+        <pre>
+          <code>
+// intersection with two double direction roads
+map_name = "san_francisco";
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+
+car_model = "gt_sensors";
+ego_init_position ="lane_540"->50; 
+ego_init_state = (ego_init_position);
+ego_target_position = "lane_572"->50; 
+ego_target_state = (ego_target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: move from lane_574 to lane_569
+npc1_init_position =  "lane_574"->100;
+npc1_init_state = (npc1_init_position, ,6);
+npc1_dest_state = ("lane_569"->30);
+npc1_model = "Sedan";
+npc1_type = (npc1_model);
+npc1 = Vehicle(npc1_init_state,  , npc1_dest_state, npc1_type);
+
+//npc2: move from lane_564 to lane_568
+npc2_init_position =  "lane_564"->10;
+npc2_init_state = (npc2_init_position, ,6);
+npc2_dest_state = ("lane_568"->50);
+npc2 = Vehicle(npc2_init_state,  , npc2_dest_state);
+
+//npc3: move from lane_565 to lane_569
+npc3_init_position =  "lane_565"->10;
+npc3_init_state = (npc3_init_position, ,6);
+npc3_dest_state = ("lane_569"->50);
+npc3 = Vehicle(npc3_init_state,  , npc3_dest_state);
+
+//npc4: move from lane_570 to lane_566
+npc4_init_position =  "lane_570"->10;
+npc4_init_state = (npc4_init_position, ,6);
+npc4_dest_state = ("lane_566"->50);
+npc4 = Vehicle(npc4_init_state,  , npc4_dest_state);
+
+//npc5: move from lane_571 to lane_567
+npc5_init_position =  "lane_571"->77;
+npc5_init_state = (npc5_init_position, ,6);
+npc5_dest_state = ("lane_567"->30);
+npc5 = Vehicle(npc5_init_state,  , npc5_dest_state); 
+
+scenario0 = CreateScenario{load(map_name);
+              ego_vehicle;
+              {npc1, npc2, npc3, npc4, npc5}; 
+              {}; // no pedestrians;
+              {}; // no obstacles;
+              evn;
+};
+
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+
+
+
+
+
+        <p>
+          The Followings are other Scenario Scripts of AVUnit.
+        </p>
+
+        <pre>
+          <code>
+//Intersection with mixed-direction roads
+map_name = "san_francisco";
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+
+car_model = "gt_sensors";
+ego_init_position = "lane_150"->150; 
+ego_init_state = (ego_init_position);
+ego_target_position = "lane_158"->50;
+ego_target_state = (ego_target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: move from lane_153 to lane_617
+npc1_init_position =  "lane_153"->50;
+npc1_init_state = (npc1_init_position, ,6);
+npc1_dest_state = ("lane_617"->100);
+npc1 = Vehicle(npc1_init_state, , npc1_dest_state);
+
+//npc2: move from lane_153 to lane_158
+npc2_init_position =  "lane_153"->70;
+npc2_init_state = (npc2_init_position, ,6);
+npc2_dest_state = ("lane_158"->100);
+npc2 = Vehicle(npc2_init_state, , npc2_dest_state);
+
+//npc3: move from  lane_153 to lane_157
+npc3_init_position =  "lane_153"->90;
+npc3_init_state = (npc3_init_position, ,6);
+npc3_dest_state = ("lane_157"->100);
+npc3 = Vehicle(npc3_init_state, , npc3_dest_state);
+
+//npc4: move from lane_152 to lane_616
+npc4_init_position =  "lane_152"->50;
+npc4_init_state = (npc4_init_position, ,6);
+npc4_waypoint =(("lane_157"->110, ,8), ("lane_157"->200, ,5), ("lane_910"->2, ,5), ("lane_616"->10, ,10));
+npc4_dest_state = ("lane_616"->100);
+npc4 = Vehicle(npc4_init_state, Waypoint(npc4_waypoint) , npc4_dest_state);
+
+scenario0 = CreateScenario{load(map_name);
+              ego_vehicle;
+              {npc1, npc2, npc3, npc4}; 
+              {}; // no pedestrians;
+              {}; // no obstacles;
+              evn;
+};
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+
+
+     
+
+<!--         <p>
+          The Fourth Scenario Script of AVUnit.
+        </p> -->
+
+        <pre>
+          <code>
+//Junction with stop sign
+
+map_name = "san_francisco";
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+
+car_model = "gt_sensors";
+ego_init_position = "lane_53"->50;
+ego_init_state = (ego_init_position);
+ego_target_position = "lane_50"->50;
+ego_target_state = (ego_target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: move from lane_61 to lane_33
+npc1_init_position =  "lane_61"->30;
+npc1_init_state = (npc1_init_position, ,5.8);
+npc1_waypoint = (("lane_707"->1, , 3), ("lane_33"->5, ,7));
+npc1_dest_state = ("lane_33"->50);
+npc1 = Vehicle(npc1_init_state, Waypoint(npc1_waypoint) , npc1_dest_state);
+
+//npc2: move from lane_60 to lane_32
+npc2_init_position =  "lane_60"->20;
+npc2_init_state = (npc2_init_position, ,5);
+npc2_waypoint = (("lane_708"->1, , 3), ("lane_32"->5, ,7));
+npc2_dest_state = ("lane_32"->50);
+npc2 = Vehicle(npc2_init_state, Waypoint(npc2_waypoint) , npc2_dest_state);
+
+//npc3: move from lane_60 to lane_51
+npc3_init_position =  "lane_60"->30;
+npc3_init_state = (npc3_init_position, ,5.5);
+npc3_waypoint = (("lane_696"->1, , 3), ("lane_51"->5, ,7));
+npc3_dest_state = ("lane_51"->50);
+npc3 = Vehicle(npc3_init_state, Waypoint(npc3_waypoint) , npc3_dest_state);
+
+//npc4: move from lane_34 to lane_51
+npc4_init_position =  "lane_34"->150;
+npc4_init_state = (npc4_init_position, ,5.5);
+npc4_waypoint = (("lane_697"->1, , 3), ("lane_51"->5, ,7));
+npc4_dest_state = ("lane_51"->50);
+npc4 = Vehicle(npc4_init_state, Waypoint(npc4_waypoint) , npc4_dest_state);
+
+//npc5: move from lane_35 to lane_63
+npc5_init_position =  "lane_35"->170;
+npc5_init_state = (npc5_init_position, ,5.5);
+npc5_waypoint = (("lane_704"->1, , 3), ("lane_63"->5, ,7));
+npc5_dest_state = ("lane_63"->50);
+npc5 = Vehicle(npc5_init_state, Waypoint(npc5_waypoint) , npc5_dest_state);
+
+//npc6: move from lane_34 to lane_50
+npc6_init_position =  "lane_34"->170;
+npc6_init_state = (npc6_init_position, ,5.5);
+npc6_waypoint = (("lane_710"->1, , 3), ("lane_50"->5, ,7));
+npc6_dest_state = ("lane_50"->150);
+npc6 = Vehicle(npc6_init_state, Waypoint(npc6_waypoint) , npc6_dest_state);
+
+//npc7: move from lane_34 to lane_62
+npc7_init_position =  "lane_34"->160;
+npc7_init_state = (npc7_init_position, ,5.4);
+npc7_dest_state = ("lane_62"->50);
+npc7 = Vehicle(npc7_init_state,, npc7_dest_state);
+
+npc = {npc1, npc2, npc3, npc4, npc5, npc6, npc7};
+
+scenario0 = CreateScenario{load(map_name);
+              ego_vehicle;
+              npc;
+              {}; // no pedestrians;
+              {}; // no obstacles;
+              evn;
+};
+
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+
+<!-- 
+        <p>
+          The Fifth Scenario Script of AVUnit.
+        </p> -->
+
+        <pre>
+          <code>
+//lane change far away from the intersection
+
+map_name = "san_francisco";
+car_model = "gt_sensors";
+    initial_position = "lane_221" -> 10;
+ego_init_state = (initial_position);
+target_position = "lane_231" -> 100;
+ego_target_state = (target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: move from lane_221 to lane_230
+npc1_init_position = "lane_221" -> 20;
+npc1 = Vehicle((npc1_init_position, ,5.6), ,("lane_230"->30));
+
+//npc2: start from lane_221
+npc2_init_position = "lane_221" -> 50;
+npc2 = Vehicle((npc2_init_position, , 7.0));
+
+//npc3: move from lane_220 to lane_231
+npc3_init_position = "lane_220" -> 50;
+npc3 = Vehicle((npc3_init_position, , 5), ,("lane_231"->110));
+
+//npc4: start from lane_220
+npc4_init_position = "lane_220" -> 30;
+npc4 = Vehicle((npc4_init_position, , 5.0));
+
+//npc5: move from lane_220 to lane_253
+npc5_init_state = ("lane_220" -> 10, ,5.0);
+npc5_waypoint = (("lane_220" -> 100, ,4.0), ("lane_1037" -> 10, ,3.0), ("lane_253" -> 10, ,8.0));
+npc5 = Vehicle(npc5_init_state, Waypoint(npc5_waypoint),("lane_253" -> 200));
+
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+scenario0 = CreateScenario{load(map_name);
+                 ego_vehicle;
+                 {npc1, npc2, npc3, npc4, npc5};
+                 {}; // no pedestrians;
+                 {}; // no obstacles;
+                 evn; 
+};
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+
+
+
+
+
+<!-- 
+        <p>
+          The Seventh Scenario Script of AVUnit.
+        </p> -->
+
+        <pre>
+          <code>
+//lane change near the intersection
+
+map_name = "san_francisco";
+car_model = "gt_sensors";
+    initial_position = "lane_221" -> 10;
+ego_init_state = (initial_position);
+target_position = "lane_231" -> 30;
+ego_target_state = (target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: start from lane_221
+npc1_init_position = "lane_221" -> 20;
+npc1 = Vehicle((npc1_init_position, ,5.0));
+
+//npc2: start from lane_221
+npc2_init_position = "lane_221" -> 50;
+npc2 = Vehicle((npc2_init_position, , 7.0));
+
+//npc3: move from lane_220 to lane_231
+npc3_init_position = "lane_220" -> 50;
+npc3 = Vehicle((npc3_init_position, , 5.5), , ("lane_231"->100));
+
+//npc4: start from lane_220
+npc4_init_position = "lane_220" -> 30;
+npc4 = Vehicle((npc4_init_position, , 5.0));
+
+//npc5: move from lane_220 to lane_253
+npc5_init_state = ("lane_220" -> 10, ,5.0);
+npc5_waypoint = (("lane_220" -> 100, ,4.0), ("lane_1037" -> 10, ,3.0), ("lane_253" -> 10, ,8.0));
+npc5 = Vehicle(npc5_init_state, Waypoint(npc5_waypoint),("lane_253" -> 200));
+
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+scenario0 = CreateScenario{load(map_name);
+                 ego_vehicle;
+                 {npc1, npc2, npc3, npc4, npc5}; 
+                 {}; // no pedestrians;
+                 {}; // no obstacles;
+                 evn; 
+};
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+
+
+<!--         <p>
+          The Eighth Scenario Script of AVUnit.
+        </p>
+ -->
+        <pre>
+          <code>
+// overtaking with static agents ahead
+
+map_name = "san_francisco";
+car_model = "gt_sensors";
+    initial_position = "lane_221" -> 5;
+ego_init_state = (initial_position);
+target_position = "lane_221" -> 110;
+ego_target_state = (target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: start from lane_221
+npc1_init_position = "lane_221" -> 20;
+npc1 = Vehicle((npc1_init_position,,0.5));
+
+//npc2: start from lane_221
+npc2_init_position = "lane_221" -> 40;
+npc2 = Vehicle((npc2_init_position,,1));
+
+//npc3: start from lane_221
+npc3_init_position = "lane_221" -> 60;
+npc3 = Vehicle((npc3_init_position,,1.2));
+
+
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+scenario0 = CreateScenario{load(map_name);
+                 ego_vehicle;
+                 {npc1, npc2, npc3}; 
+                 {}; // no pedestrians;
+                 {}; // no obstacles;
+                 evn; 
+};
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+<!-- 
+
+        <p>
+          The Nineth Scenario Script of AVUnit.
+        </p> -->
+
+        <pre>
+          <code>
+// road merging or T junction
+map_name = "san_francisco";
+car_model = "gt_sensors";
+initial_position = "lane_317" -> 240;
+ego_init_state = (initial_position);
+target_position = "lane_321" -> 50;
+ego_target_state = (target_position);
+vehicle_type = (car_model);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+//npc1: move from lane_328 to lane_320
+npc1_init_position = "lane_328"->20;
+npc1_init_state = (npc1_init_position, ,5.0);
+wp11 = ("lane_328"->100, ,5.0);
+wp12 = ((553307.261867189, 4183201.9591673343), , 4.5);
+wp13= ((553309.3614155288, 4183208.8865965335), , 4.0);
+wp14= ((553305.65, 4183212.53), , 5.0);
+wp15 = ("lane_320"->50, ,6.0);
+npc1_waypoints = (wp11, wp12, wp13, wp14, wp15);
+npc1_destination = ("lane_320"->100);
+npc1 = Vehicle(npc1_init_state, Waypoint(npc1_waypoints));
+
+//npc2: move from lane_331 to lane_321
+npc2_init_position = "lane_331"->20;
+npc2_init_state = (npc2_init_position, ,5.0);
+wp21 = ("lane_331"->100, ,5.0);
+wp22 = ("lane_1160"->0, , 4.5);
+wp23= ((553315.2383076187, 4183207.2174681155), , 4.0);
+wp24= ((553312.2639423843, 4183213.1879271), , 4.0);
+wp25 = ("lane_321"->50, ,6.0);
+npc2_waypoints = (wp21, wp22, wp23, wp24, wp25);
+npc2_destination = ("lane_321"->100);
+npc2 = Vehicle(npc2_init_state, Waypoint(npc2_waypoints), npc2_destination);
+
+//npc3: move from lane_330 to lane_322
+npc3_init_position = "lane_330"->20;
+npc3_init_state = (npc3_init_position, ,5.0);
+wp31 = ("lane_330"->100, ,5.0);
+wp32 = ("lane_1161"->0, , 4.5);
+wp33= ((553319.5, 4183208.69), , 4.0);
+wp34 = ((553314.3420368667, 4183217.027038428), , 5.0);
+wp35 = ("lane_322"->50, ,6.0);
+npc3_waypoints = (wp31, wp32, wp33, wp34, wp35);
+npc3_destination = ("lane_322"->100);
+npc3 = Vehicle(npc3_init_state, Waypoint(npc3_waypoints), npc3_destination);
+
+//npc4: move from lane_329 to lane_323
+npc4_init_position = "lane_329"->20;
+npc4_init_state = (npc4_init_position, ,5.0);
+wp41 = ("lane_329"->50, ,6.0);
+wp42 = ("lane_1162"->0, , 5);
+wp43= ((553322.757594728, 4183206.63), , 3);
+wp44 = ((553316.4349628921, 4183219.8604124514), , 7.0);
+wp45 = ("lane_323"->50, ,5.0);
+npc4_waypoints = (wp41, wp42, wp43, wp44, wp45);
+npc4_destination = ("lane_323"->100);
+npc4 = Vehicle(npc4_init_state, Waypoint(npc4_waypoints), npc4_destination);
+
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+evn = Environment(time, weather);
+
+scenario0 = CreateScenario{load(map_name);
+              ego_vehicle;
+              {npc1, npc2, npc3, npc4};
+              {}; // no pedestrians;
+              {}; // no obstacles;
+              evn;
+};
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+
+        <pre>
+          <code>
+// intersection turn left
+//map_name = "san_francisco";
+map_name = "san_francisco";
+
+car_model = "gt_sensors";
+car_color = green;
+//ego_init_position = ENU (553090.0522572036, 4182687.8);
+ego_init_position = "lane_8"->5;
+ego_init_state = (ego_init_position);
+
+
+
+ego_target_position = "lane_45"->100;
+
+ego_target_state = (ego_target_position);
+vehicle_type = (car_model, car_color);
+ego_vehicle = AV(ego_init_state, ego_target_state, vehicle_type);
+
+heading1 = 10 deg related to ego_vehicle;
+npc_init_state = ("lane_8"->20, , 10.0);
+npc1_type = "Sedan";
+npc_state1 = (("lane_45"->2, ,6), ("lane_35"->1, ,3),("lane_55"->1, ,6), ("lane_43"->30, ,25));
+npc1_destination = ("lane_43"->150);
+npc1 = Vehicle(npc_init_state, Waypoint(npc_state1), npc1_destination, (npc1_type));
+
+heading2 = 50 deg related to npc1;
+npc_init_state2 = ("lane_8"->10.0, ,3.0);
+npc_state2 = (("lane_780"->1.0, ,10.0), ("lane_782"->10.0, , 4.0), ("lane_76"->0.0, , 4.0), ("lane_40"->20.0, ,5.0));
+npc_target_state2 = ("lane_40"->100.0);
+npc2_type = "SUV";
+npc2 =Vehicle(npc_init_state2, Waypoint(npc_state2), npc_target_state2, (npc2_type));
+
+
+npc_init_state3 = ("lane_9"->10.0, , 5.0);
+npc_target_state3 = ("lane_40"->90.0);
+npc3 = Vehicle(npc_init_state3,,npc_target_state3);
+
+npc_init_state4 = ("lane_47"->30.0, ,3.0);
+npc_state4 = (("lane_788"->1.0, ,10.0));
+npc_target_state4 = ("lane_7"->30.0);
+npc4 =Vehicle(npc_init_state4, Waypoint(npc_state4), npc_target_state4);
+
+
+npc_init_state5 = ("lane_785"->30.0, ,2.0);
+npc_state5 = (("lane_44"->1.0, ,10.0));
+npc_target_state5 = ("lane_768"->30.0);
+npc5 =Vehicle(npc_init_state5, Waypoint(npc_state5), npc_target_state5);
+
+
+npc = {npc1, npc2, npc3, npc4, npc5};
+
+time = 12:00;
+weather = {rain:0.5, snow: 0.1, wetness: heavy};
+
+evn = Environment(time, weather);
+
+ped_position = (553020.54, 4182693.69);
+ped_heading = 90 deg related to "lane_38"->30;
+ped_init_state= (ped_position, ped_heading, 1.0);
+ped_state_list = (((553020.54,4182693.69), ped_heading, 1.0),((553023.26, 4182671.82), ped_heading, 1.0));
+//ped_state_list = (("lane_759"->7, , 1.0), ("lane_759"->15, , 1.0));
+ped_motion = Waypoint(ped_state_list);
+ped = Pedestrian(ped_init_state, ped_motion);
+
+
+scenario0 = CreateScenario{load(map_name);
+              ego_vehicle;
+              npc; // no other vehicles;
+              {ped}; // no pedestrians;
+              {}; // no obstacles;
+              evn; // default environment
+};
+
+
+Trace trace = EXE(scenario0);
+          </code>
+        </pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+
+      <hr>
+
+<!--       <div class="row text-center">
+        
+        <div class="col-lg-12">
+          <ul class="pagination">
+            <li><a href="index.html">&laquo;</a></li>
+            <li class="active"><a href="index.html">1</a></li>
+            <li><a href="safety2.html">2</a></li>
+            <li><a href="safety3.html">3</a></li>
+            <li><a href="safety4.html">4</a></li>
+            <li><a href="safety5.html">5</a></li>
+            <li><a href="safety2.html">&raquo;</a></li>
+          </ul>        
+        </div>
+
+      </div> -->
+
+    </div>
+    <!-- /.container -->
+
+<!--     <div class="container">
+
+      <hr>
+
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p>Copyright &copy; Company <span id="getCurrentDate"></span></p>
+          </div>
+        </div>
+      </footer>
+      
+    </div> --> <!-- /.container -->
+
+    <!-- JavaScript -->
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script type="text/javascript">
+      var dt = new Date();
+      document.getElementById('getCurrentDate').innerHTML = dt.getFullYear();
+    </script>
+  </body>
+
+</html>
